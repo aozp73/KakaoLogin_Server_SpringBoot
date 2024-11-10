@@ -12,6 +12,7 @@ public class JoinUserDto {
     public User toEntity() {
         return User.builder()
                 .username(username)
+                .role("user")
                 .build();
     }
 }

@@ -29,7 +29,7 @@ public class KakaoContoller {
     public ResponseEntity<?> loginCallback(@RequestParam("code") String code) {
         LOGGER.info("코드 값", code);
 
-        return ResponseEntity.ok().body(kakaoService.loginProcessWtihCode(code));
+        return ResponseEntity.ok().body(kakaoService.loginProcessWithCode(code));
     }
 
     @RequestMapping("/profile")

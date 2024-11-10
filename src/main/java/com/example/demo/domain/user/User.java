@@ -16,9 +16,24 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 엔티티의 식별자 (Primary Key)
+    private Long id;
 
     @Column(nullable = false)
     private String username;
 
+    @Column(nullable = false)
+    private String role;
+
+    public User() {
+    }
+
+    public User(Long id, String username, String role) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+    }
+
+    public User(String username) {
+        this.username = username;
+    }
 }

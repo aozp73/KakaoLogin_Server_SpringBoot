@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.common.Const;
 import com.example.demo.domain.user.UserRepository;
 import com.example.demo.service.HttpCallService;
+import com.example.demo.springsecurity.CustomLoginProcess;
 import com.example.demo.transformer.Trans;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,8 @@ public class KakaoService {
 	public HttpCallService httpCallService;
 	@Autowired
 	public UserRepository userRepository;
+	@Autowired
+	public CustomLoginProcess customLoginProcess;
 
 	@Value("${rest-api-key}")
 	private String REST_API_KEY;
@@ -62,40 +65,45 @@ public class KakaoService {
 	}
 
 	@Transactional(readOnly = true)
-	public Map<String, String> loginProcessWtihCode(String code) {
-
-		Map<String, String> responseMap = new HashMap<>();
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		// 1. 인가 코드 -> 엑세스 토큰
-		getAccessToken(code);
-		try {
-			// 2. 엑세스 토큰 -> 사용자 정보
-			String userProfile = getProfile();
-
-			// 3-1. 파싱
-			JsonNode rootNode = objectMapper.readTree(userProfile);
-			JsonNode kakaoAccountNode = rootNode.path("kakao_account");
-			JsonNode profileNode = kakaoAccountNode.path("profile");
-			String userName = profileNode.path("nickname").asText();
-
-			// 3-2. 회원등록여부 확인 (인증서 방식에선 '인증결과 CI값 / DB CI값' 비교)
-			Boolean joinYn = findJoinInfo(userName);
-			LOGGER.info("userName: {}", userName);
-			LOGGER.info("YN: {}", joinYn);
-
-			// 회원등록여부에 따른 처리
-			if (joinYn) {
-				// 화면: 유저 정보 / SpringSecurity: 로그인 처리
-				responseMap.put("profile", userProfile);
-			} else if (!joinYn) {
-				responseMap.put("profile", null);
-			}
-		} catch (Exception e) {
-		}
-
-		return responseMap;
+	public Map<String, String> loginProcessWithCode(String code) {
+		return customLoginProcess.loginProcessWithCode(code);
 	}
+
+	// @Transactional(readOnly = true)
+	// public Map<String, String> loginProcessWtihCode(String code) {
+
+	// Map<String, String> responseMap = new HashMap<>();
+	// ObjectMapper objectMapper = new ObjectMapper();
+
+	// // 1. 인가 코드 -> 엑세스 토큰
+	// getAccessToken(code);
+	// try {
+	// // 2. 엑세스 토큰 -> 사용자 정보
+	// String userProfile = getProfile();
+
+	// // 3-1. 파싱
+	// JsonNode rootNode = objectMapper.readTree(userProfile);
+	// JsonNode kakaoAccountNode = rootNode.path("kakao_account");
+	// JsonNode profileNode = kakaoAccountNode.path("profile");
+	// String userName = profileNode.path("nickname").asText();
+
+	// // 3-2. 회원등록여부 확인 (인증서 방식에선 '인증결과 CI값 / DB CI값' 비교)
+	// Boolean joinYn = findJoinInfo(userName);
+	// LOGGER.info("userName: {}", userName);
+	// LOGGER.info("YN: {}", joinYn);
+
+	// // 회원등록여부에 따른 처리
+	// if (joinYn) {
+	// // 화면: 유저 정보 / SpringSecurity: 로그인 처리
+	// responseMap.put("profile", userProfile);
+	// } else if (!joinYn) {
+	// responseMap.put("profile", null);
+	// }
+	// } catch (Exception e) {
+	// }
+
+	// return responseMap;
+	// }
 
 	public Boolean findJoinInfo(String userName) {
 		return userRepository.existsByUsername(userName);

@@ -11,6 +11,11 @@ server:
       charset: utf-8
       enabled: true
       force: true
+    session:
+      cookie:
+        http-only: true
+        same-site: none
+
   port: 80
 
 spring:
