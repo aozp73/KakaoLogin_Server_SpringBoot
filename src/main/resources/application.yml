@@ -1,5 +1,5 @@
 rest-api-key: ${RESTAPI_KEY}
-redirect-uri: "http://localhost:80/login-callback"
+redirect-uri: "http://localhost:8080/OauthCodeResPage"
 client-secret: ""
 authorize-uri: "https://kauth.kakao.com/oauth/authorize"
 token-uri: "https://kauth.kakao.com/oauth/token"
